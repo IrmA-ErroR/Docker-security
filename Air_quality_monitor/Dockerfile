@@ -1,7 +1,6 @@
-FROM node:latest
-WORKDIR /usr/src/app
+FROM python:3.9
+WORKDIR /app
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-
-RUN npm install express chart.js sqlite3 ejs
-EXPOSE 3000
-CMD ["node", "app.js"]
+CMD ["python", "app.py"]

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitor - March 2025</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Air Quality Monitoring - March 2025</h1>
+        
+        <div class="chart-container">
+            <canvas id="pollenChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="dustChart"></canvas>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Pollen Level</th>
+                    <th>PM2.5</th>
+                    <th>PM10</th>
+                    <th>Temperature (°C)</th>
+                    <th>Humidity (%)</th>
+                    <th>Wind Speed (m/s)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ record.pollen_level }}</td>
+                    <td>{{ "%.1f"|format(record.dust_pm25) }}</td>
+                    <td>{{ "%.1f"|format(record.dust_pm10) }}</td>
+                    <td>{{ "%.1f"|format(record.temperature) if record.temperature else '-' }}</td>
+                    <td>{{ "%.0f"|format(record.humidity) if record.humidity else '-' }}</td>
+                    <td>{{ "%.1f"|format(record.wind_speed) if record.wind_speed else '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Pollen Level Chart
+        const pollenCtx = document.getElementById('pollenChart').getContext('2d');
+        const pollenChart = new Chart(pollenCtx, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [{
+                    label: 'Pollen Level (0-5 scale)',
+                    data: {{ pollen|safe }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5
+                    }
+                }
+            }
+        });
+
+        // Dust Level Chart
+        const dustCtx = document.getElementById('dustChart').getContext('2d');
+        const dustChart = new Chart(dustCtx, {
+            type: 'line',
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [
+                    {
+                        label: 'PM2.5 (µg/m³)',
+                        data: {{ pm25|safe }},
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    },
+                    {
+                        label: 'PM10 (µg/m³)',
+                        data: {{ pm10|safe }},
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+</body>
+</html>

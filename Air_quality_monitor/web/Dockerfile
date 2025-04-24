@@ -1,4 +1,5 @@
 FROM python:3.13-alpine
+RUN apk update sqlite-libs && apk upgrade sqlite-libs
 # Создаем непривилегированного пользователя
 RUN adduser -D appuser
 USER appuser

@@ -14,4 +14,8 @@ ENV PYTHONUNBUFFERED=1 \
 # Защищенные настройки Flask
 ENV FLASK_ENV=production \
     FLASK_DEBUG=0
+    
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+CMD curl -f http://localhost:5000/health || exit 1
+
 CMD ["python3", "app.py"]
